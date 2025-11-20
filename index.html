@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franz Looks | Digital Cards System</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- JS propio -->
+    <script src="app.js" defer></script>
+</head>
+
+<body class="font-sans text-slate-800 antialiased">
+
+    <!-- ======================================================================= -->
+    <!-- MODULE 1: AUTH / LOGIN SCREEN -->
+    <!-- ======================================================================= -->
+    <div id="login-screen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-fade-in">
+        <div
+            class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col md:flex-row h-[600px]">
+            <!-- Left Side: Brand -->
+            <div
+                class="w-full md:w-1/2 bg-gradient-to-br from-blue-900 to-slate-900 p-12 text-white flex flex-col justify-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                </div>
+                <div
+                    class="w-32 h-32 bg-blue-500/20 rounded-full blur-3xl absolute -top-10 -left-10 animate-pulse-slow">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-2xl font-bold mb-6 shadow-lg shadow-blue-600/50">
+                        F</div>
+                    <h1 class="text-4xl font-bold mb-4">Franz Looks</h1>
+                    <p class="text-blue-200 text-lg leading-relaxed">Plataforma integral para la gestión de identidad
+                        digital corporativa.</p>
+                    <div class="mt-12 flex items-center gap-3 text-sm text-blue-300">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Enterprise Edition v2.0</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Side: Roles -->
+            <div class="w-full md:w-1/2 p-12 bg-white flex flex-col justify-center">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Bienvenido</h2>
+                <p class="text-slate-500 mb-10">Selecciona un perfil para iniciar la demostración.</p>
+                <div class="space-y-4">
+                    <button onclick="App.Router.login('admin')"
+                        class="group w-full p-4 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md transition-all text-left flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-laptop-code text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 group-hover:text-blue-700">Administrador</h3>
+                            <p class="text-xs text-slate-500">Gestión masiva, Dashboard</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right ml-auto text-slate-300 group-hover:text-blue-500"></i>
+                    </button>
+                    <button onclick="App.Router.login('employee')"
+                        class="group w-full p-4 rounded-2xl border border-slate-200 hover:border-green-500 hover:bg-green-50 hover:shadow-md transition-all text-left flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 group-hover:bg-green-500 group-hover:text-white flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-mobile-screen text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 group-hover:text-green-700">Empleado (Franz Looks)</h3>
+                            <p class="text-xs text-slate-500">Vista de tarjeta digital</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right ml-auto text-slate-300 group-hover:text-green-500"></i>
+                    </button>
+                </div>
+                <div class="mt-auto pt-8 text-center">
+                    <p class="text-xs text-slate-400">Developed by XTA Tech</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- MODULE 2: ADMIN APPLICATION -->
+    <!-- ======================================================================= -->
+    <div id="admin-app"
+        class="hidden relative w-full h-full flex overflow-hidden opacity-0 transition-opacity duration-500">
+
+        <!-- Admin Sidebar -->
+        <aside id="sidebar"
+            class="w-64 h-full glass-panel border-r border-slate-200 flex flex-col z-20 transition-transform duration-300 transform lg:translate-x-0 -translate-x-full absolute lg:relative">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">F
+                </div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Franz Looks</h1>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <button onclick="App.Router.switchAdminTab('dashboard')"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl bg-blue-50 text-blue-700 transition-colors">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
+                    <i class="fa-solid fa-users"></i> Empleados
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
+                    <i class="fa-solid fa-qrcode"></i> Códigos QR
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
+                    <i class="fa-solid fa-cog"></i> Configuración
+                </button>
+            </nav>
+            <div class="p-4 border-t border-slate-100">
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="https://randomuser.me/api/portraits/men/85.jpg" class="w-8 h-8 rounded-full">
+                        <div>
+                            <p class="text-xs font-bold text-slate-700">Eduardo Aviles</p>
+                            <p class="text-[10px] text-slate-500">Admin IT</p>
+                        </div>
+                    </div>
+                    <button onclick="App.Router.logout()"
+                        class="w-full text-xs text-red-500 hover:bg-red-50 py-1.5 rounded-lg transition-colors">
+                        <i class="fa-solid fa-sign-out-alt mr-1"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Admin Main Content -->
+        <main class="flex-1 relative h-full flex flex-col bg-white/80 backdrop-blur-md">
+            <header
+                class="h-16 shrink-0 border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 bg-white/90 backdrop-blur z-10">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-toggle" class="lg:hidden text-slate-500 hover:text-slate-700">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <h2 id="page-title" class="text-lg font-semibold text-slate-800">Gestión de Tarjetas</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="App.Router.logout()"
+                        class="text-xs text-slate-400 hover:text-blue-600 underline">Reset Demo</button>
+                </div>
+            </header>
+
+            <!-- Content Scroll Area -->
+            <div class="flex-1 overflow-y-auto p-8 relative">
+
+                <!-- SUB-VIEW: DASHBOARD -->
+                <div id="dashboard-view" class="max-w-7xl mx-auto space-y-8 animate-slide-up">
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-slate-500 font-medium">Total Tarjetas</p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">320</h3>
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-xs text-green-600 flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-up"></i> 12% vs mes anterior
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-slate-500 font-medium">Escaneos (Mes)</p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">1,452</h3>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-xs text-slate-400">Actualizado hace 5 min</div>
+                        </div>
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-blue-100 font-medium">Acción Rápida</p>
+                                    <h3 class="text-xl font-bold mt-1">Carga Masiva</h3>
+                                    <p class="text-xs text-blue-100 mt-1 opacity-80">Subir Excel de empleados</p>
+                                </div>
+                                <div class="p-3 bg-white/20 rounded-xl text-white backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
+                                    onclick="App.Components.Modals.Upload.toggle()">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800">Directorio de Empleados</h3>
+                            <div class="flex gap-2">
+                                <button onclick="App.Actions.admin.filterByDeptPrompt()"
+                                    class="px-4 py-2 text-sm text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fa-solid fa-filter mr-2"></i>Filtrar
+                                </button>
+                                <button onclick="App.Components.Modals.Upload.toggle()"
+                                    class="px-4 py-2 text-sm text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-lg shadow-slate-800/30">
+                                    <i class="fa-solid fa-plus mr-2"></i>Nuevo
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                                    <tr>
+                                        <th class="px-6 py-4">Empleado</th>
+                                        <th class="px-6 py-4">Puesto</th>
+                                        <th class="px-6 py-4">Departamento</th>
+                                        <th class="px-6 py-4 text-center">Estado</th>
+                                        <th class="px-6 py-4 text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employee-table-body" class="divide-y divide-slate-100">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW: DEVICE PREVIEW -->
+                <div id="preview-view"
+                    class="hidden min-h-full flex flex-col items-center justify-center py-12 animate-fade-in relative">
+                    <button onclick="App.Router.switchAdminTab('dashboard')"
+                        class="fixed top-24 left-8 lg:left-72 px-4 py-2 bg-white text-slate-600 rounded-lg shadow hover:bg-slate-50 transition-colors z-30 border border-slate-200">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Volver
+                    </button>
+                    <div class="text-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800">Vista Previa del Dispositivo</h3>
+                        <p class="text-sm text-slate-500">Así verán la tarjeta los clientes de Franz Looks</p>
+                    </div>
+                    <div
+                        class="w-full max-w-[360px] h-[720px] bg-slate-900 rounded-[45px] shadow-2xl border-[12px] border-slate-900 relative overflow-hidden shrink-0 mx-auto ring-8 ring-slate-900/10">
+                        <!-- Phone Hardware UI -->
+                        <div class="absolute top-28 -right-4 w-1 h-16 bg-slate-800 rounded-r-md"></div>
+                        <div class="absolute top-28 -left-4 w-1 h-8 bg-slate-800 rounded-l-md"></div>
+                        <div class="absolute top-40 -left-4 w-1 h-16 bg-slate-800 rounded-l-md"></div>
+                        <div
+                            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-20 flex justify-center items-center">
+                            <div class="w-16 h-1.5 bg-slate-800/50 rounded-full"></div>
+                        </div>
+                        <!-- Screen Content -->
+                        <div id="preview-iframe" class="w-full h-full bg-white overflow-y-auto hide-scrollbar relative">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- MODULE 3: EMPLOYEE APPLICATION (MOBILE VIEW) -->
+    <!-- ======================================================================= -->
+    <div id="employee-app"
+        class="hidden fixed inset-0 z-40 bg-slate-100 overflow-y-auto opacity-0 transition-opacity duration-500">
+        <div class="mobile-app-container bg-white min-h-full pb-12 relative">
+            <button onclick="App.Router.logout()"
+                class="fixed bottom-6 right-6 z-50 w-12 h-12 bg-slate-800 text-white rounded-full shadow-lg flex items-center justify-center text-xs hover:scale-110 transition-transform"
+                title="Salir de la Demo">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+            <!-- Content will be injected here by App.Components.MobileView -->
+            <div id="employee-app-content"></div>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- MODULE 4: SHARED MODALS -->
+    <!-- ======================================================================= -->
+
+    <!-- Upload Modal -->
+    <div id="upload-modal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 transform scale-95 transition-transform duration-300"
+            id="upload-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-slate-800">Carga Masiva de Empleados</h3>
+                <button onclick="App.Components.Modals.Upload.toggle()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="drop-zone"
+                class="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-2xl p-10 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
+                onclick="App.Services.UploadSimulator.start()">
+                <div id="upload-initial-state">
+                    <div
+                        class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+                        <i class="fa-solid fa-file-excel text-2xl"></i>
+                    </div>
+                    <p class="text-slate-600 font-medium">Arrastra tu archivo Excel aquí</p>
+                    <p class="text-xs text-slate-400 mt-2">o haz clic para buscar en tu ordenador</p>
+                </div>
+                <div id="upload-loading-state" class="hidden">
+                    <div class="loader mx-auto mb-4 border-blue-500 border-t-transparent"></div>
+                    <p class="text-slate-600 font-medium">Procesando datos...</p>
+                    <p id="upload-progress-text" class="text-xs text-slate-400 mt-2">0% completado</p>
+                    <div class="w-full bg-slate-200 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div id="progress-bar" class="bg-blue-500 h-full rounded-full transition-all duration-300"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+                <div id="upload-success-state" class="hidden">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-check text-2xl"></i>
+                    </div>
+                    <p class="text-slate-800 font-bold">¡Carga Completa!</p>
+                    <p class="text-sm text-slate-500 mt-1">Se han añadido 54 nuevos registros.</p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="App.Components.Modals.Upload.toggle()"
+                    class="px-5 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 rounded-xl transition-colors">Cancelar</button>
+                <button id="btn-finish-upload" onclick="App.Components.Modals.Upload.toggle()"
+                    class="hidden px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/20 transition-colors">Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qr-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-0 overflow-hidden transform scale-95 transition-transform duration-300"
+            id="qr-modal-content">
+            <div class="bg-slate-800 p-6 text-white text-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                </div>
+                <button onclick="App.Components.Modals.QR.toggle()"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-white"><i
+                        class="fa-solid fa-times"></i></button>
+                <h3 class="text-lg font-bold relative z-10">Código QR Generado</h3>
+                <p class="text-xs text-slate-400 mt-1 relative z-10">Listo para imprimir o compartir</p>
+            </div>
+            <div class="p-8 text-center">
+                <div class="bg-white p-4 rounded-2xl shadow-inner border border-slate-100 inline-block mb-6">
+                    <img id="qr-modal-img" src="" alt="QR Code" class="w-48 h-48">
+                </div>
+                <h4 id="qr-modal-name" class="font-bold text-slate-800">Nombre Empleado</h4>
+                <p id="qr-modal-role" class="text-xs text-slate-500 mb-6">Puesto</p>
+                <div class="flex gap-3">
+                    <button onclick="App.UI.showToast('QR Copiado al portapapeles')"
+                        class="flex-1 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                        <i class="fa-regular fa-copy mr-2"></i> Copiar
+                    </button>
+                    <button onclick="App.UI.showToast('Descargando PNG...')"
+                        class="flex-1 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/20 transition-colors">
+                        <i class="fa-solid fa-download mr-2"></i> PNG
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Helper -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">Acción realizada con éxito</span>
+    </div>
+
+</body>
+
+</html>
