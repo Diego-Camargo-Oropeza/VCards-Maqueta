@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franz Looks | Tarjeta Digital</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- JS propio -->
+    <script src="app.js" defer></script>
+</head>
+<body class="font-sans text-slate-800 antialiased">
+
+    <!-- ======================================================================= -->
+    <!-- EMPLOYEE APPLICATION (SOLO VISTA MÓVIL) -->
+    <!-- ======================================================================= -->
+    <div id="employee-app" class="hidden fixed inset-0 z-40 bg-slate-100 overflow-y-auto opacity-0 transition-opacity duration-500">
+        <div class="mobile-app-container bg-white min-h-full pb-12 relative">
+            <!-- En producción este botón podría ocultarse o hacer "volver" -->
+            <button onclick="App.Router.logout()" class="fixed bottom-6 right-6 z-50 w-12 h-12 bg-slate-800 text-white rounded-full shadow-lg flex items-center justify-center text-xs hover:scale-110 transition-transform" title="Salir">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+
+            <div id="employee-app-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Helper (opcional si quieres mostrar mensajes aquí) -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">Acción realizada con éxito</span>
+    </div>
+
+</body>
+</html>

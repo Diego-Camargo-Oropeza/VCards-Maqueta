@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Franz Looks | Admin</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js (para la gráfica de escaneos) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- JS propio -->
+    <script src="app.js" defer></script>
+</head>
+
+<body class="font-sans text-slate-800 antialiased">
+    <!-- ======================================================================= -->
+    <!-- ADMIN APPLICATION (SOLO ADMIN, SIN LOGIN, SIN EMPLOYEE) -->
+    <!-- ======================================================================= -->
+    <div id="admin-app"
+        class="hidden relative w-full h-full flex overflow-hidden opacity-0 transition-opacity duration-500">
+        <!-- Admin Sidebar -->
+        <aside id="sidebar"
+            class="w-64 h-full glass-panel border-r border-slate-200 flex flex-col z-20 transition-transform duration-300 transform lg:translate-x-0 -translate-x-full absolute lg:relative">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+                    VC
+                </div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">
+                    VCards
+                </h1>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl bg-blue-50 text-blue-700 transition-colors"
+                    data-tab="dashboard" onclick="App.Router.switchAdminTab('dashboard')">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"
+                    data-tab="employees" onclick="App.Router.switchAdminTab('employees')">
+                    <i class="fa-solid fa-users"></i> Empleados
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"
+                    data-tab="qrs" onclick="App.Router.switchAdminTab('qrs')">
+                    <i class="fa-solid fa-qrcode"></i> Códigos QR
+                </button>
+                <button
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"
+                    data-tab="settings" onclick="App.Router.switchAdminTab('settings')">
+                    <i class="fa-solid fa-cog"></i> Configuración
+                </button>
+            </nav>
+            <div class="p-4 border-t border-slate-100">
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="https://randomuser.me/api/portraits/men/85.jpg" class="w-8 h-8 rounded-full" />
+                        <div>
+                            <p class="text-xs font-bold text-slate-700">
+                                Eduardo Aviles
+                            </p>
+                            <p class="text-[10px] text-slate-500">Admin IT</p>
+                        </div>
+                    </div>
+                    <button onclick="App.Router.logout()"
+                        class="w-full text-xs text-red-500 hover:bg-red-50 py-1.5 rounded-lg transition-colors">
+                        <i class="fa-solid fa-sign-out-alt mr-1"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Admin Main Content -->
+        <main class="flex-1 relative h-full flex flex-col bg-white/80 backdrop-blur-md">
+            <header
+                class="h-16 shrink-0 border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 bg-white/90 backdrop-blur z-10">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-toggle" class="lg:hidden text-slate-500 hover:text-slate-700">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 id="page-title" class="text-lg font-semibold text-slate-800">
+                        Gestión de Tarjetas
+                    </h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="App.Router.logout()" class="text-xs text-slate-400 hover:text-blue-600 underline">
+                        Reset Demo
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Scroll Area -->
+            <div class="flex-1 overflow-y-auto p-8 relative">
+                <!-- =================================================================== -->
+                <!-- SUB-VIEW: DASHBOARD (KPIs / RESUMEN) -->
+                <!-- =================================================================== -->
+                <div id="dashboard-view" class="max-w-7xl mx-auto space-y-8 animate-slide-up">
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-slate-500 font-medium">
+                                        Total Tarjetas
+                                    </p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">
+                                        320
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-xs text-green-600 flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-up"></i> 12% vs mes
+                                anterior
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta dinámica de escaneos del mes -->
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-slate-500 font-medium">
+                                        Escaneos (Mes)
+                                    </p>
+                                    <h3 class="text-3xl font-bold text-slate-800 mt-1">
+                                        <span id="scan-total-month">1,452</span>
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-xs text-slate-400">
+                                Último minuto:&nbsp;
+                                <span id="scan-last-minute" class="font-semibold text-slate-600">0</span>
+                                &nbsp;escaneos
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm text-blue-100 font-medium">
+                                        Acción Rápida
+                                    </p>
+                                    <h3 class="text-xl font-bold mt-1">
+                                        Carga Masiva
+                                    </h3>
+                                    <p class="text-xs text-blue-100 mt-1 opacity-80">
+                                        Subir Excel de empleados
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-white/20 rounded-xl text-white backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
+                                    onclick="App.Components.Modals.Upload.toggle()">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica de escaneos + actividad reciente -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                        <!-- Panel de gráfica -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="text-sm font-semibold text-slate-800">
+                                        Escaneos en el tiempo (demo)
+                                    </h4>
+                                    <p class="text-xs text-slate-400">
+                                        Simulación de escaneos en tiempo real
+                                        sobre un periodo configurable.
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="text-slate-400 mr-1">Periodo:</span>
+                                    <button type="button" data-scan-period="5" onclick="App.Dashboard.setPeriod(5)"
+                                        class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50">
+                                        5 min
+                                    </button>
+                                    <button type="button" data-scan-period="15" onclick="App.Dashboard.setPeriod(15)"
+                                        class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50">
+                                        15 min
+                                    </button>
+                                    <button type="button" data-scan-period="60" onclick="App.Dashboard.setPeriod(60)"
+                                        class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50">
+                                        1 h
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="scan-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Panel de actividad reciente -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-semibold text-slate-800">
+                                    Actividad reciente
+                                </h4>
+                                <span class="text-[11px] text-slate-400">últimos eventos</span>
+                            </div>
+                            <div id="scan-log" class="mt-2 space-y-2 max-h-64 overflow-y-auto text-xs">
+                                <!-- Líneas de actividad se inyectan vía JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- SUB-VIEW: EMPLEADOS -->
+                <!-- =================================================================== -->
+                <div id="employees-view" class="hidden max-w-7xl mx-auto space-y-6 animate-slide-up">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">
+                                Empleados
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                Gestión del directorio de empleados y sus
+                                tarjetas digitales.
+                            </p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="App.Actions.admin.filterByDeptPrompt()"
+                                class="px-4 py-2 text-sm text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                <i class="fa-solid fa-filter mr-2"></i>Filtrar
+                                por departamento
+                            </button>
+                            <button onclick="App.Components.Modals.Upload.toggle()"
+                                class="px-4 py-2 text-sm text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-lg shadow-slate-800/30">
+                                <i class="fa-solid fa-plus mr-2"></i>Nuevo
+                                (Carga Masiva)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div
+                            class="p-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div class="text-sm text-slate-500">
+                                Directorio completo de empleados activos. Haz
+                                clic en una fila para ver la vista previa de la
+                                tarjeta.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input id="employee-search" type="text" placeholder="Buscar por nombre o puesto..."
+                                    class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    oninput="App.Actions.admin.searchEmployees(this.value)" />
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                                    <tr>
+                                        <th class="px-6 py-4">Empleado</th>
+                                        <th class="px-6 py-4">Puesto</th>
+                                        <th class="px-6 py-4">
+                                            Departamento
+                                        </th>
+                                        <th class="px-6 py-4 text-center">
+                                            Estado
+                                        </th>
+                                        <th class="px-6 py-4 text-right">
+                                            Acciones
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employee-table-body" class="divide-y divide-slate-100">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- SUB-VIEW: CÓDIGOS QR -->
+                <!-- =================================================================== -->
+                <div id="qr-view" class="hidden max-w-7xl mx-auto space-y-6 animate-slide-up">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">
+                                Códigos QR
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                Visualiza y gestiona los códigos QR
+                                individuales por empleado.
+                            </p>
+                        </div>
+                        <button onclick="App.UI.showToast('Funcionalidad de exportación masiva en desarrollo')"
+                            class="px-4 py-2 text-sm text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                            <i class="fa-solid fa-file-export mr-2"></i>Exportar
+                            reporte
+                        </button>
+                    </div>
+
+                    <div id="qr-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Cards de QRs generadas por JS -->
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- SUB-VIEW: CONFIGURACIÓN -->
+                <!-- =================================================================== -->
+                <div id="settings-view" class="hidden max-w-3xl mx-auto space-y-6 animate-slide-up">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">
+                            Configuración
+                        </h3>
+                        <p class="text-sm text-slate-500">
+                            Parámetros generales del sistema de VCards.
+                        </p>
+                    </div>
+
+                    <form onsubmit="App.Actions.admin.saveSettings(event)"
+                        class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">URL base de las tarjetas</label>
+                            <input id="setting-base-url" type="text"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="https://placeholder.com/card/"
+                                value="https://vcardsnew.markekint.com/{id}" />
+                            <p class=" text-xs text-slate-400">
+                                Se usa como base para generar los enlaces que se
+                                codifican dentro de los QR.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700">Tamaño del QR (px)</label>
+                                <input id="setting-qr-size" type="number" min="150" max="600" step="10"
+                                    class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value="200" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700">Color Primario</label>
+                                <input id="setting-primary-color" type="color"
+                                    class="w-16 h-10 p-1 border border-slate-200 rounded-lg cursor-pointer"
+                                    value="#0f172a" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">Opciones</label>
+                            <div class="space-y-2 text-sm text-slate-600">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input id="setting-track-scans" type="checkbox" class="rounded border-slate-300"
+                                        checked />
+                                    <span>Habilitar analítica de escaneos
+                                        (demo)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input id="setting-auto-generate" type="checkbox" class="rounded border-slate-300"
+                                        checked />
+                                    <span>Generar QR automáticamente al
+                                        registrar nuevos empleados</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" onclick="App.Actions.admin.resetSettings()"
+                                class="px-4 py-2 text-sm text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                Restaurar valores por defecto
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- SUB-VIEW: DEVICE PREVIEW -->
+                <!-- =================================================================== -->
+                <div id="preview-view"
+                    class="hidden min-h-full flex flex-col items-center justify-center py-12 animate-fade-in relative">
+                    <button onclick="App.Router.switchAdminTab('dashboard')"
+                        class="fixed top-24 left-8 lg:left-72 px-4 py-2 bg-white text-slate-600 rounded-lg shadow hover:bg-slate-50 transition-colors z-30 border border-slate-200">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Volver
+                    </button>
+                    <div class="text-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800">
+                            Vista Previa del Dispositivo
+                        </h3>
+                        <p class="text-sm text-slate-500">
+                            Así verán la tarjeta los clientes de Franz Looks
+                        </p>
+                    </div>
+                    <div
+                        class="w-full max-w-[360px] h-[720px] bg-slate-900 rounded-[45px] shadow-2xl border-[12px] border-slate-900 relative overflow-hidden shrink-0 mx-auto ring-8 ring-slate-900/10">
+                        <!-- Phone Hardware UI -->
+                        <div class="absolute top-28 -right-4 w-1 h-16 bg-slate-800 rounded-r-md"></div>
+                        <div class="absolute top-28 -left-4 w-1 h-8 bg-slate-800 rounded-l-md"></div>
+                        <div class="absolute top-40 -left-4 w-1 h-16 bg-slate-800 rounded-l-md"></div>
+                        <div
+                            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-20 flex justify-center items-center">
+                            <div class="w-16 h-1.5 bg-slate-800/50 rounded-full"></div>
+                        </div>
+                        <!-- Screen Content -->
+                        <div id="preview-iframe" class="w-full h-full bg-white overflow-y-auto hide-scrollbar relative">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- MODALES COMPARTIDOS (ADMIN) -->
+    <!-- ======================================================================= -->
+
+    <!-- Upload Modal -->
+    <div id="upload-modal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 transform scale-95 transition-transform duration-300"
+            id="upload-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-slate-800">
+                    Carga Masiva de Empleados
+                </h3>
+                <button onclick="App.Components.Modals.Upload.toggle()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="drop-zone"
+                class="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-2xl p-10 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
+                onclick="App.Services.UploadSimulator.start()">
+                <div id="upload-initial-state">
+                    <div
+                        class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+                        <i class="fa-solid fa-file-excel text-2xl"></i>
+                    </div>
+                    <p class="text-slate-600 font-medium">
+                        Arrastra tu archivo Excel aquí
+                    </p>
+                    <p class="text-xs text-slate-400 mt-2">
+                        o haz clic para buscar en tu ordenador
+                    </p>
+                </div>
+                <div id="upload-loading-state" class="hidden">
+                    <div class="loader mx-auto mb-4 border-blue-500 border-t-transparent"></div>
+                    <p class="text-slate-600 font-medium">
+                        Procesando datos...
+                    </p>
+                    <p id="upload-progress-text" class="text-xs text-slate-400 mt-2">
+                        0% completado
+                    </p>
+                    <div class="w-full bg-slate-200 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div id="progress-bar" class="bg-blue-500 h-full rounded-full transition-all duration-300"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+                <div id="upload-success-state" class="hidden">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-check text-2xl"></i>
+                    </div>
+                    <p class="text-slate-800 font-bold">
+                        ¡Carga Completa!
+                    </p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Se han añadido 54 nuevos registros.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="App.Components.Modals.Upload.toggle()"
+                    class="px-5 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button id="btn-finish-upload" onclick="App.Components.Modals.Upload.toggle()"
+                    class="hidden px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/20 transition-colors">
+                    Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qr-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-0 overflow-hidden transform scale-95 transition-transform duration-300"
+            id="qr-modal-content">
+            <div class="bg-slate-800 p-6 text-white text-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                </div>
+                <button onclick="App.Components.Modals.QR.toggle()"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+                <h3 class="text-lg font-bold relative z-10">
+                    Código QR Generado
+                </h3>
+                <p class="text-xs text-slate-400 mt-1 relative z-10">
+                    Listo para imprimir o compartir
+                </p>
+            </div>
+            <div class="p-8 text-center">
+                <div class="bg-white p-4 rounded-2xl shadow-inner border border-slate-100 inline-block mb-6">
+                    <img id="qr-modal-img" src="" alt="QR Code" class="w-48 h-48" />
+                </div>
+                <h4 id="qr-modal-name" class="font-bold text-slate-800">
+                    Nombre Empleado
+                </h4>
+                <p id="qr-modal-role" class="text-xs text-slate-500 mb-6">
+                    Puesto
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="App.UI.showToast('QR Copiado al portapapeles')"
+                        class="flex-1 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                        <i class="fa-regular fa-copy mr-2"></i> Copiar
+                    </button>
+                    <button onclick="App.UI.showToast('Descargando PNG...')"
+                        class="flex-1 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/20 transition-colors">
+                        <i class="fa-solid fa-download mr-2"></i> PNG
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Helper -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">Acción realizada con éxito</span>
+    </div>
+</body>
+
+</html>
